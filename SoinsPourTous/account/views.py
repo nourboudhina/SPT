@@ -36,19 +36,6 @@ from .models import Grade ,Groupe ,Gouvernorat
 from .models import Nationalite
 
 
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def get_token(request):
-    user = request.user
-    if not user.is_authenticated:
-        return Response({'error': 'User is not authenticated'}, status=401)
-
-    try:
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key})
-    except Exception as e:
-        return Response({'error': str(e)}, status=500)
 
 def list_nationalites(request):
     nationalites = Nationalite.objects.all()

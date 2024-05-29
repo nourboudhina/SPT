@@ -107,7 +107,6 @@ def send_message(request, token):
 
     # Extract the sender object based on the token type
     sender = doctor.user if doctor else patient.user
-
     # Extract data from POST request
     room_code = request.data.get('room_code')
     message_value = request.data.get('message')
