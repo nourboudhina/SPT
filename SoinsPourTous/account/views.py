@@ -36,7 +36,6 @@ from .models import Grade ,Groupe ,Gouvernorat
 from .models import Nationalite
 
 
-
 def list_nationalites(request):
     nationalites = Nationalite.objects.all()
     data = [{'id': n.id, 'nationalite': n.nationalite} for n in nationalites]
