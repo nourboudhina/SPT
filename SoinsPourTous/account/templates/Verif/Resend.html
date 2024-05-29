@@ -69,8 +69,11 @@
                                         <div class="p-2">
                                             <form>
                                                 <div class="mb-4">
-                                                    <label class="form-label">Numéro de téléphone</label>
-                                                    <input type="text" class="form-control" id="phone" placeholder="Saisiez votre numéro">
+                                                    <label for="phone" class="form-label">Numéro de téléphone <span class="text-danger">*</span></label>
+                                                    <input type="tel" class="form-control" id="phone" placeholder="Entrer votre numéro" pattern="^\+216[1-9]\d{7}$" required>
+                                                    <div class="invalid-feedback">
+                                                        Veuillez saisir un numéro de téléphone valide sous la forme +216XXXXXXXX.
+                                                    </div>
                                                 </div>
 
                                                 <div class="text-center mt-4">

@@ -376,7 +376,6 @@ def get_PaiementHistorique(request, token):
         else:
             return JsonResponse({"error": "Token invalide"}, status=400)
 
-
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, BasicAuthentication])
 def suivi_apc(request, token):

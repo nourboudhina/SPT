@@ -16,22 +16,18 @@ from twilio.rest import Client # type: ignore
 
 
 def send_otp(phone):
-    # Génération de l'OTP
-    otp = randint(100000, 999999)
-    
-    # Calcul de la validité de l'OTP (10 minutes à partir de maintenant)
+   
+    otp = randint(1000, 9999)
     validity = datetime.datetime.now() + datetime.timedelta(minutes=10)
-    
-    # Sauvegarde de l'OTP dans la base de données
+
     Otp.objects.update_or_create(phone=phone, defaults={"otp": otp, "verified": False, "validity": validity})
-    
-    # Envoi de l'OTP par SMS via Twilio
+
     try:
         # Remplacez 'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER' par vos informations Twilio
-        client = Client('ACf4c36e8d499a2bcdd4fa2a9e34c7d642', 'be330ae24f67a533ff54695e537c43e6')
+        client = Client('AC464d7d24b2008670153c4bf483e8be10', 'dd2fb47121741b1d0d17fc267009c4a5')
         message = client.messages.create(
             body=f"Votre code OTP est : {otp}",
-            from_='+12052368057',
+            from_='+12513129402',
             to=phone
         )
         print("OTP sent successfully:", message.sid)
@@ -45,6 +41,8 @@ def send_otp(phone):
     except Exception as e:
         print("Failed to send OTP:", str(e))
         return JsonResponse({'message': 'Failed to send OTP'}, status=500)
+    
+
 def new_token() : 
     token = uuid.uuid1().hex
     return token

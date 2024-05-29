@@ -69,11 +69,12 @@
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="phone" class="form-label">Numéro de téléphone <span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" id="phone" placeholder="Entrer votre numéro" required>
+                                                    <input type="tel" class="form-control" id="phone" placeholder="Entrer votre numéro" pattern="^\+216[1-9]\d{7}$" required>
                                                     <div class="invalid-feedback">
-                                                        Veuillez saisir le numéro de téléphone.
+                                                        Veuillez saisir un numéro de téléphone valide sous la forme +216XXXXXXXX.
                                                     </div>
                                                 </div>
+                                                
                                                 <div class="mb-3">
                                                     <label for="password-input" class="form-label">Mot de passe</label>
                                                     <div class="position-relative auth-pass-inputgroup">
@@ -133,14 +134,14 @@
                     form.classList.add('was-validated');
                     return;
                 }
-
+    
                 var formData = {
                     email: document.getElementById('useremail').value,
                     fullname: document.getElementById('fullname').value,
                     phone: document.getElementById('phone').value,
                     password: document.getElementById('password-input').value,
                 };
-
+    
                 fetch('/create_account/', {
                     method: 'POST',
                     headers: {
@@ -154,16 +155,17 @@
                     if (data.message) {
                         // Send OTP request after successful account creation
                         return fetch('/request_otp/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': getCookie('csrftoken')
-                            },
-                            body: JSON.stringify({
-                                email: formData.email,
-                                phone: formData.phone
-                            })
-                        });
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({
+        email: formData.email,
+        phone: formData.phone
+    })
+});
+
                     } else {
                         throw new Error(data.error);
                     }
@@ -182,7 +184,7 @@
                     alert(error.message);
                 });
             });
-
+    
             // Toggle password visibility
             document.getElementById('password-addon').onclick = function () {
                 var passwordInput = document.getElementById('password-input');
@@ -194,7 +196,7 @@
                     this.innerHTML = '<i class="ri-eye-fill align-middle"></i>';
                 }
             };
-
+    
             // Function to get CSRF token
             function getCookie(name) {
                 var cookieValue = null;
@@ -212,5 +214,6 @@
             }
         });
     </script>
+    
 </body>
 </html>

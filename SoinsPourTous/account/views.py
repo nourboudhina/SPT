@@ -5,7 +5,7 @@ from random import randint
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404,redirect
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from account.models import Specialite, Otp, PasswordResetToken, Token, User, Medecin, TokenForDoctor, Agent, TokenForAgent ,Service 
 from account.utils import IsAuthenticatedUser, send_otp, send_password_reset_email, token_response, token_response_Agent, token_response_doctor
 from rest_framework.parsers import FormParser
@@ -34,6 +34,21 @@ import uuid
 from .serializers import MedecinSerializer, GradeSerializer ,GroupeSerializer,SpecialiteSerializer
 from .models import Grade ,Groupe ,Gouvernorat
 from .models import Nationalite
+
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, BasicAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_token(request):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({'error': 'User is not authenticated'}, status=401)
+
+    try:
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
 
 def list_nationalites(request):
     nationalites = Nationalite.objects.all()
@@ -465,7 +480,7 @@ def request_otp(request):
 
     if email and phone:
         if not User.objects.filter(email=email).exists():
-            return JsonResponse({'error': 'username does not exist'}, status=400)
+            return JsonResponse({'error': 'user does not exist'}, status=400)
 
         if not User.objects.filter(phone=phone).exists():
             return JsonResponse({'error': 'Phone does not exist'}, status=400)
@@ -543,19 +558,18 @@ def verify_otp(request):
 def create_account(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body.decode('utf-8'))
+            data = request.data
 
             fullname = data.get('fullname')
             email = data.get('email')
             phone = data.get('phone')
             password = data.get('password')
-            
 
             print(f"Received data - Email: {email}, Phone: {phone}, Password: {password}, Fullname: {fullname}")
 
             if email and phone and password and fullname:
                 print(f"Trying to find Otp for phone: {phone}")
-                User.objects.create(email=email, phone=phone, fullname=fullname, password=password,id=email)   
+                User.objects.create(email=email, phone=phone, fullname=fullname, password=password, id=email)   
                 return JsonResponse({"message": "account created successfully"})
             else:
                 error_message = "Invalid data provided. "

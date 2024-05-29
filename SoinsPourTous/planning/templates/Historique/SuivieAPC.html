@@ -5,42 +5,31 @@
 
 <head><!-- fullcalendar css -->
     <link href="{% static 'assets/libs/fullcalendar/main.min.css' %}" rel="stylesheet" type="text/css" />
-    <!-- Layout config Js -->
-    <script src="{% static 'assets/js/layout.js' %}"></script>
-    <!-- Bootstrap Css -->
-    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="{% static 'assets/css/custom.min.css' %}" rel="stylesheet" type="text/css" />
+    </head>
 
-
-</head>
-
-<div class="main-content">
-
-    <div class="page-content">
-        <div class="container-fluid">
-
-            <!-- start page title -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                        <h4 class="mb-sm-0">Suivie D'APC</h4>
-
-                       
+    <div class="main-content">
+    
+        <div class="page-content">
+            <div class="container-fluid">
+    
+                <!-- start page title -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                            <h4 class="mb-sm-0">Suivie d'APC</h4>
+    
+                           
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- end page title -->
-
-            <div class="row">
-                <div class="col-12">
-                    <div class="row">
-                        <div class="col-xl-3">
-                            <div class="card card-h-100">
+                <!-- end page title -->
+    
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-xl-3">
+                                <div class="card card-h-100">
+                                            
                                         
                                 <h5 class="mb-1">Total des Consultations par mois:</h5>
                                 
@@ -131,7 +120,7 @@
             const calendarEl = document.getElementById('calendar');
             const apcListElement = document.getElementById('upcoming-event-list');
             const pathArray = window.location.pathname.split('/');
-            const token = pathArray[pathArray.length - 2]; // Assuming token is the last segment
+            const token = pathArray[pathArray.length - 2]; // Assuming token is the second last segment
     
             if (!calendarEl || !apcListElement) {
                 console.error('Required DOM elements are missing.');
@@ -147,9 +136,9 @@
                 },
                 events: function(fetchInfo, successCallback, failureCallback) {
                     const year = fetchInfo.start.getFullYear();
-                    const month = fetchInfo.start.getMonth() + 1; // Les mois commencent à 0 dans JavaScript
-
-// Log the extracted year and month
+                    const month = (fetchInfo.start.getMonth() + 1).toString().padStart(2, '0'); // Les mois commencent à 0 dans JavaScript
+    
+                    // Log the extracted year and month
                     console.log(`Year: ${year}, Month: ${month}`);
     
                     if (!year || !month) {
@@ -187,7 +176,7 @@
                             });
                             successCallback(events);
     
-                            apcListElement.innerHTML = `<h5>Total des Consultations: ${data.total_patients}</h5>`;
+                            apcListElement.innerHTML = `<h5>Total: ${data.total_patients}</h5>`;
                             data.apc.forEach(apc => {
                                 apcListElement.innerHTML += `
                                     <div class='apc-item'>
@@ -211,10 +200,6 @@
         });
     </script>
     
-    
-    
-        
-        
         
         
      <!-- JAVASCRIPT -->

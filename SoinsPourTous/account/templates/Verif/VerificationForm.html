@@ -64,7 +64,7 @@
                                         </div>
                                         <div class="text-muted text-center mx-lg-3">
                                             <h4 class="">Vérification de votre téléphone</h4>
-                                            <p>Veuillez saisir le code de 6 chiffres envoyé à <span class="fw-semibold">votre téléphone</span></p>
+                                            <p>Veuillez saisir le code de 4 chiffres envoyé à <span class="fw-semibold">votre téléphone</span></p>
                                         </div>
 
                                         <div class="mt-4">
@@ -97,18 +97,7 @@
                                                             <input type="text" class="form-control form-control-lg bg-light border-light text-center" onkeyup="moveToNext(4, event)" maxLength="1" id="digit4-input">
                                                         </div>
                                                     </div><!-- end col -->
-                                                    <div class="col-3">
-                                                        <div class="mb-3">
-                                                            <label for="digit4-input" class="visually-hidden">Digit 5</label>
-                                                            <input type="text" class="form-control form-control-lg bg-light border-light text-center" onkeyup="moveToNext(4, event)" maxLength="1" id="digit4-input">
-                                                        </div>
-                                                    </div><!-- end col -->
-                                                    <div class="col-3">
-                                                        <div class="mb-3">
-                                                            <label for="digit4-input" class="visually-hidden">Digit 6</label>
-                                                            <input type="text" class="form-control form-control-lg bg-light border-light text-center" onkeyup="moveToNext(4, event)" maxLength="1" id="digit4-input">
-                                                        </div>
-                                                    </div><!-- end col -->
+                                                    
                                                 </div>
 
                                                 <div class="mt-3">
@@ -190,9 +179,7 @@
                 document.getElementById('digit1-input').value,
                 document.getElementById('digit2-input').value,
                 document.getElementById('digit3-input').value,
-                document.getElementById('digit4-input').value,
-                document.getElementById('digit5-input').value,
-                document.getElementById('digit6-input').value
+                document.getElementById('digit4-input').value
             ].join('');
 
             fetch('/verify_otp/', { 
