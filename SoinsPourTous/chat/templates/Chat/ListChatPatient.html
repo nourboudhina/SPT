@@ -62,9 +62,9 @@
 
                                 <div class="chat-message-list">
 
-                                    <div class="list-unstyled chat-list chat-user-list" id="userList">
+                                    <ulclass="list-unstyled chat-list chat-user-list" id="userList">
                                         <!-- Dynamically filled -->
-                                    </div>
+                                </ul>
                                 </div>
                                 <div class="chat-message-list">
 
@@ -103,9 +103,7 @@
                                                     <div class="flex-grow-1 overflow-hidden">
                                                         <div class="d-flex align-items-center">
                                                             <div class="flex-shrink-0 chat-user-img online user-own-img align-self-center me-3 ms-0">
-                                                                <img src=" " class="rounded-circle avatar-xs" alt="">
-                                                                <!-- imgae de patient -->
-                                                                <span class="user-status"></span>
+                                                               
                                                             </div>
                                                             <div class="flex-grow-1 overflow-hidden">
                                                                 <h4 id='roomid' class="text-truncate mb-0 fs-16"><a class="text-reset username" data-bs-toggle="offcanvas"  aria-controls="userProfileCanvasExample">
@@ -209,7 +207,7 @@
           text-align: left;
           margin-right: auto;
         }
-        .room-button {
+        .room-item {
     display: block;
     margin: 10px 0;
     padding: 10px;
@@ -218,9 +216,10 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    list-style: none; /* Remove the default list styling */
 }
 
-.room-button:hover {
+.room-item:hover {
     background-color: #0ea83f;
 }
       </style>
@@ -246,170 +245,160 @@
      <!-- App js -->
      <script src="{% static 'assets/js/app.js' %}"></script>
      <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const token = '8061e258170811ef8733c89402a799ef'; // Replace with dynamic token retrieval logic
-        fetchDoctorRooms(token);
-        const userList = document.getElementById('userList');
-        userList.addEventListener('click', function(event) {
-            let target = event.target;
-            while (target != this) {
-                if (target.tagName === 'BUTTON') {
-                    const roomCode = target.getAttribute('data-room-code'); 
-                    const id = target.getAttribute('userid'); 
-                    const username = target.getAttribute('username'); 
-                    document.getElementById('username').textContent = username;
-                    document.getElementById('userid').textContent = id;
-                    document.getElementById('roomid').textContent = roomCode;
-                    openChatRoom(roomCode, id);
-                    break;
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = await getToken(); // Replace with dynamic token retrieval logic
+            fetchDoctorRooms(token);
+    
+            const userList = document.getElementById('userList');
+            userList.addEventListener('click', function(event) {
+                let target = event.target;
+                while (target !== this) {
+                    if (target.tagName === 'LI') {
+                        const roomCode = target.getAttribute('data-room-code'); 
+                        const id = target.getAttribute('userid'); 
+                        const username = target.getAttribute('username'); 
+                        document.getElementById('username').textContent = username;
+                        document.getElementById('userid').textContent = id;
+                        document.getElementById('roomid').textContent = roomCode;
+                        openChatRoom(roomCode, id, token);
+                        break;
+                    }
+                    target = target.parentNode;
                 }
-                target = target.parentNode;
-            }
-        });
-
-        document.getElementById('chatinput-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission behavior
-            sendMessage(token);
-        });
-    });
-    function getToken() {
-        // Replace this with the actual logic to retrieve the token securely
-        return '8061e258170811ef8733c89402a799ef';
-    }
-    function fetchDoctorRooms(token) {
-        const url = `/chat/getPatientRooms/${token}/`;
-
-        fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${token}` // Adjust this if you use a different auth method
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.error('Failed to fetch rooms:', data.error);
-            } else {
-                const userList = document.getElementById('userList');
-                userList.innerHTML = ''; // Clear current list
-                data.rooms.forEach(room => {
-                    const button = document.createElement('button');
-                    button.textContent = `Room Code: ${room.code}, Medecin: ${room.medecin_name}`;
-                    button.setAttribute('data-room-code', room.code);
-                    button.setAttribute('userid', room.medecin_id);
-                    button.setAttribute('username', room.medecin_name);
-                    button.classList.add('room-button'); 
-                    button.addEventListener('click', () => {
-                        console.log(`Room code: ${room.code}, Medecin: ${room.medecin_name}`);
-                    });
-                    userList.appendChild(button);
-                });
-            }
-        })
-        .catch(error => console.error('Error fetching rooms:', error));
-    }
-
-    function openChatRoom(roomCode, id) {
-        const token = '8061e258170811ef8733c89402a799ef';  // Replace with secure token retrieval
-        const currentUserID = id;  // This should be dynamically retrieved
-
-        fetch(`/chat/messages/${token}/${roomCode}/`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            const messageList = document.getElementById('users-conversation');
-            messageList.innerHTML = '';  // Clear existing messages
-            data.forEach(msg => {
-                const messageElement = document.createElement('li');
-                messageElement.classList.add('message');
-                messageElement.textContent = msg.value;  // Message text
-
-                // Check if the current user is the sender
-                if (msg.sender === currentUserID) {
-                    messageElement.classList.add('sender');
-                } else {
-                    messageElement.classList.add('receiver');
-                }
-
-                messageList.appendChild(messageElement);
             });
-        })
-        .catch(error => {
-            console.error('Error fetching messages:', error);
+    
+            document.getElementById('chatinput-form').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission behavior
+                sendMessage(token);
+            });
         });
-    }
-
-    document.getElementById('chatinput-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission behavior
-    const messageInput = document.getElementById('chat-input');
-    const messageText = messageInput.value;
-
-    id=document.getElementById('userid').textContent;
-    roomCode=document.getElementById('roomid').textContent;
-     // Ensure the room code is set correctly
-    const token = '8061e258170811ef8733c89402a799ef'; // Retrieve this securely, e.g., from a meta tag or another storage
-    alert(messageText)
-    alert(roomCode)
-    if (!messageText.trim()) {
-        alert('Please enter a message.');
-        return;
-    }
-
-    fetch(`/chat/send_message/${token}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-             // Include this if your API requires authentication
-        },
-        body: JSON.stringify({
-            message: messageText,
-            room_code: roomCode,
-            receiver_id: id, // This needs to be fetched or determined based on the chat context
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            console.error('Error sending message:', data.error);
-            alert('Failed to send message: ' + data.error);
-        } else {
-            console.log('Message sent:', data);
-            // Optionally clear the input field
-            messageInput.value = '';
-            // Append the new message to the chat window
-            appendMessageToChat(data);
+    
+        async function getToken() {
+            
+            return '8061e258170811ef8733c89402a799ef';
         }
-    })
-    .catch(error => console.error('Error sending message:', error));
-});
-
-function appendMessageToChat(message) {
-    const messageList = document.getElementById('users-conversation');
-    const messageElement = document.createElement('li');
-    messageElement.textContent = message.message; // Adjust according to your response structure
-    messageList.appendChild(messageElement);
-}
-
-
-    function displayNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.classList.add('alert', `alert-${type}`, 'alert-dismissible');
-        notification.role = 'alert';
-        notification.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-    }
-</script>
+    
+        function fetchDoctorRooms(token) {
+            const url = `/chat/getPatientRooms/${token}/`;
+    
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Failed to fetch rooms:', data.error);
+                } else {
+                    const userList = document.getElementById('userList');
+                    userList.innerHTML = ''; // Clear current list
+                    data.rooms.forEach(room => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Room Code: ${room.code}, Medecin: ${room.medecin_name}`;
+                        listItem.setAttribute('data-room-code', room.code);
+                        listItem.setAttribute('userid', room.medecin_id);
+                        listItem.setAttribute('username', room.medecin_name);
+                        listItem.classList.add('room-item'); 
+                        userList.appendChild(listItem);
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching rooms:', error));
+        }
+    
+        function openChatRoom(roomCode, id, token) {
+            fetch(`/chat/messages/${token}/${roomCode}/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageList = document.getElementById('users-conversation');
+                messageList.innerHTML = '';  // Clear existing messages
+                data.forEach(msg => {
+                    const messageElement = document.createElement('li');
+                    messageElement.classList.add('message');
+                    messageElement.textContent = msg.value;  // Message text
+    
+                    // Check if the current user is the sender
+                    if (msg.sender === id) {
+                        messageElement.classList.add('sender');
+                    } else {
+                        messageElement.classList.add('receiver');
+                    }
+    
+                    messageList.appendChild(messageElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching messages:', error);
+            });
+        }
+    
+        function sendMessage(token) {
+            const messageInput = document.getElementById('chat-input');
+            const messageText = messageInput.value;
+            const id = document.getElementById('userid').textContent;
+            const roomCode = document.getElementById('roomid').textContent;
+    
+            if (!messageText.trim()) {
+                alert('Please enter a message.');
+                return;
+            }
+    
+            fetch(`/chat/send_message/${token}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    message: messageText,
+                    room_code: roomCode,
+                    receiver_id: id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error sending message:', data.error);
+                    alert('Failed to send message: ' + data.error);
+                } else {
+                    console.log('Message sent:', data);
+                    messageInput.value = '';
+                    appendMessageToChat(data);
+                }
+            })
+            .catch(error => console.error('Error sending message:', error));
+        }
+    
+        function appendMessageToChat(message) {
+            const messageList = document.getElementById('users-conversation');
+            const messageElement = document.createElement('li');
+            messageElement.textContent = message.message; // Adjust according to your response structure
+            messageList.appendChild(messageElement);
+        }
+    
+        function displayNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.classList.add('alert', `alert-${type}`, 'alert-dismissible');
+            notification.role = 'alert';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(notification);
+    
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+    </script>
+    
 
         
 
