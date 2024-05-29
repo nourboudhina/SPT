@@ -46,5 +46,4 @@ urlpatterns = [
     path("logoutAgent/<str:token>/",logout_Agent),
     path("logoutMedecin/<str:token>/",logout_medecin),
     path("logoutPatient/<str:token>/",logout_patient),
-   
 ]
